@@ -6,4 +6,6 @@ connect(process.env.MONGO_URL,{
     useUnifiedTopology: true
 });
 
+console.log('Connected to database');
+
 module.exports = connection;
