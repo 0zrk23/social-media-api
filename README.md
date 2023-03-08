@@ -14,6 +14,8 @@ Welcome to the social media API! This api is designed for a social media appliat
 
 ## Usage
 
+[Social-Media-API-how-to.webm](https://user-images.githubusercontent.com/115580058/223876476-033f3403-410e-416d-b6b9-a521e8bf5611.webm)
+
 To use this application, you can use an api testing platform or query through browser. The video above shows how to query and some of the results from the possible queryies.
 
 ## Credits
