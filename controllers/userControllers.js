@@ -20,7 +20,7 @@ async function getUserById(req,res,next){
             res.status(404).json({statusMessage: 'No user with this ID'});
             return;
         }
-        res.status(200).json(userData);
+        res.status(200).json(instanceOfUserData);
     } catch (err) {
         console.log(err)
         res.status(500).json(err);

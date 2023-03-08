@@ -13,8 +13,9 @@ const userSchema = new Schema(
             type: String,
             required: [true, 'Email is required'],
             unique: true,
-            validation: {
+            validate: {
                 validator: function (emailString){
+                    console.log(/^[\w\.-]+@[\da-z\.-]+\.[a-z\.]{2,6}$/.test(emailString))
                     return /^[\w\.-]+@[\da-z\.-]+\.[a-z\.]{2,6}$/.test(emailString);
                 },
                 message: emailString => `${emailString} is not a valid email`
