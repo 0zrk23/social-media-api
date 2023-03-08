@@ -23,12 +23,14 @@ const thoughtSchema = new Schema(
         reactions: [reactionSchema]
     },
     {
+        // toJSON: { getters: true },
         id: false
     }
 )
 
-function queryDate(){
-    return this.createdAt.toLocalDateString();
+function queryDate(createdAt){
+    // console.log(createdAt);
+    return 'test';
 }
 
 thoughtSchema.virtual('reactCount').get(function () {

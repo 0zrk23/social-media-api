@@ -22,12 +22,14 @@ const reactionSchema = new Schema(
         }
     },
     {
-        // id: false,
+        id: false,
     }
 )
 
-function queryDate(){
-    return this.createdAt.toLocalDateString();
+
+function queryDate(createdAt){
+    // console.log(createdAt);
+    return 'test';
 }
 
 
