@@ -3,26 +3,26 @@ const {Schema, Types} = require('mongoose');
 const reactionSchema = new Schema(
     {
         reactionId: {
-            Type: Types.ObjectId,
-            default: () => new ObjectId
+            type: Types.ObjectId,
+            default: () => new Types.ObjectId()
         },
         reactionBody: {
-            Type: String,
+            type: String,
             required: true,
             maxLength: 280
         },
         username: {
-            Type: String,
+            type: String,
             required: true
         },
         createdAt: {
-            Type: Date,
+            type: Date,
             default: Date.now,
             get: queryDate
         }
     },
     {
-        id: false,
+        // id: false,
     }
 )
 

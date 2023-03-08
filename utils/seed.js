@@ -1,121 +1,88 @@
+const {getReactions, generateUsers, getThoughts} = require('./data');
+const connection = require('../config/connection');
+// const {generateUsers} = require('./data')
+const {User,Thought} = require('../models');
+// const cTable = require('console.table')
 
-const userPart = [
-    "mon",
-    "g0d",
-    "succ",
-    "trash",
-    "69",
-    "420",
-    "cap",
-    "bussin",
-    "dorito",
-    "cat",
-    "dog",
-    "potato",
-    "panda",
-    "sad",
-    "sic",
-    "fat",
-    "cow",
-    "ice",
-    "frosty",
-    "bandit",
-    "13",
-    "79",
-    "aim",
-    "pretty",
-    "sparkle",
-    "fancy",
-    "loud",
-    "ninja",
-    "best",
-    "pog",
-    "bussin",
-    "mighty",
-    "sparrow",
-    "guardian",
-    "knight",
-    "champion",
-    "expert",
-    "master",
-    "sage",
-    "13",
-    "392",
-    "2",
-    "quan",
-    "ch",
-    "carl",
-    "billy",
-    "ham",
+connection.on('error', (err) => console.log(err));
 
-]
-
-const possibleReactions = [
-    'I disagree!',
-    'Your thought succs',
-    'This was awesome',
-    'Thank you for the great content',
-    "I can tell if this you're just a sad human being, or want attention",
-    'Love your thougts!! Please make more!!!',
-    'This is so lovely!',
-    "I can tell you love this topic a ton!",
-    "Agreed man!",
-    "Straight cap",
-    "This thought straight bussin frfr no cap"
-];
-
-const lorum = [
-    'lorem',
-    'imsum',
-    'dolor',
-    'sit',
-    'amet',
-    'consectetur',
-    'adipiscing',
-    'elit',
-    'curabitur',
-    'vel',
-    'hendrerit',
-    'libero',
-    'eleifend',
-    'blandit',
-    'nunc',
-    'ornare',
-    'odio',
-    'ut',
-    'orci',
-    'gravida',
-    'imperdiet',
-    'nullam',
-    'purus',
-    'lacinia',
-    'a',
-    'pretium',
-    'quis',
-  ];
-
-  const genRandomIndex = (arr) => Math.floor(Math.random() * arr.length);
+// console.log(generateRandomUsername());
+connection.once('open', async () => {
   
-  const getRandomWord = () => `${lorum[genRandomIndex(lorum)]}`;
+  console.log('Deleting documents...')
+  await User.deleteMany({});
+  
+  await Thought.deleteMany({});
 
-  const getRandomReaction = () => {
-    return `${lorum[genRandomIndex(lorum)]}`
+  const users = generateUsers();
+  
+  
+  console.log('Seeding Users...')
+  await User.collection.insertMany(users)
+  // await Thought.collection.insertMany(thou)
+  
+  console.log('Seeding Thoughts...')
+  for(let i = 0; i < users.length; i++){
+    await createThoughtDoc(users,i);
+    await addFriend(users[i],i,users);
   }
 
-  const generateRandomUsername = () => {
-    let username = '';
-    for (let i = 0; i < 3; i++){
-        username += `${userPart[genRandomIndex(userPart)]}`
+  const userDocs = await User.find({}).lean();
+  const thoughtDocs = await Thought.find({}).lean();
+  
+  // console.table(userDocs);
+  // console.table(thoughtDocs);
+  
+  console.info('Seeding complete! 🌱');
+  process.exit(0);
+});
+
+async function addFriend(user, index, users){
+  // console.log(user);
+  const newFriends = getFriendIds(user,index,users)
+  // console.log(newFriends);
+  const filter = {_id: user._id};
+  const update = {$addToSet: {friends: newFriends},}
+  const userData = await User.findOneAndUpdate(filter,update,{new: true})
+  // console.log(userData);
+}
+
+function getFriendIds(user, index, users){
+  const friends = [];
+  let friendIndex = index + 3
+  for(let i = 0; i < (Math.floor(Math.random()*4)+1);i++) {
+    if(friendIndex > users.length - 1){
+      friendIndex -= users.length - 1
     }
-    return username;
+    friends.push(users[friendIndex]._id);
+    friendIndex += 3;
   }
+  // console.log(friends);
+  return friends;
+}
 
-  const generateThought = (words) => {
-    let post = '';
-    for (let i = 0; i < words; i++) {
-      post += ` ${getRandomWord()}`;
-    }
-    return post;
-  };
+async function createThoughtDoc(users,userIndex){
+  // const thoughtIds = [];
+  const thoughtData = getThoughts();
+  // console.log(newThoughts);
+  // const newThought = Thought.create({thoughtText:})
+  for(let i in thoughtData){
+    const reactions = getReactions(users);
+    // console.log(reactions);
+    const newThought = await Thought.create({
+      thoughtText: thoughtData[i],
+      username: users[userIndex].username,
+      reactions: reactions
+    })
+    const instantceOfUpdatedUser = await User.findOneAndUpdate(
+      {_id: users[userIndex]._id},
+      {$addToSet: {thoughts: newThought._id}},
+      {new: true}
+    )
+    // console.log(instantceOfUpdatedUser);
+  }
+}
 
-  module.exports = {generateRandomUsername, generateThought}
+const tableData = (err, data) => {
+  console.table(data);
+}
