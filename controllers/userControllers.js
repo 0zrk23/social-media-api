@@ -123,6 +123,38 @@ async function addFriend(req,res,next){
     }
 }
 
+async function removeFriend(req,res,next){
+    try{
+        //check if user exists
+        const instanceOfUserData = await User.findOne({_id: req.params.userId}).populate('friends').populate('thoughts').lean();
+        if(!instanceOfUserData){
+            res.status(404).json({statusMessage: 'No user with this ID'});
+            return;
+        }
+        //check if friend exists
+        const instanceOfFriendData = await User.findOne({_id: req.params.friendId}).populate('friends').populate('thoughts').lean();
+        if(!instanceOfFriendData){
+            res.status(404).json({statusMessage: 'No user with this ID'});
+            return;
+        }
+        console.log([instanceOfUserData,instanceOfFriendData]);
+        //remove friend from the user model matching the userId
+        const instanceOfUpdatedUser = await User.updateOne(
+            {_id: req.params.userId},
+            {$pull: {friends: req.params.friendId}},
+            {new: true}
+        )
+        console.log(instanceOfUpdatedUser);
+        //display and return response
+        console.log(`Removed ${instanceOfFriendData.username} from ${instanceOfUserData.username}'s friend list`)
+        res.status(200).json({statusMessage: `Removed ${instanceOfFriendData.username} from ${instanceOfUserData.username}'s friend list`, instanceOfUpdatedUser})
+        // res.status(200).send('done');
+    } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+    }
+}
+
 module.exports = {
     getUsers,
     getUserById,
@@ -130,4 +162,5 @@ module.exports = {
     updateUser,
     deleteUser,
     addFriend,
+    removeFriend
 };
