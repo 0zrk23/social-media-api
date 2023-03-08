@@ -1,5 +1,7 @@
-const {connect , connection} = require('mongoose');
+const {set, connect , connection} = require('mongoose');
 require('dotenv').config();
+
+set('toJSON',{virtuals: true, getters: true});
 
 connect(process.env.MONGO_URL,{
     useNewUrlParser: true,

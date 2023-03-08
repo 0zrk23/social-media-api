@@ -1,15 +1,16 @@
 const {Schema, Types, model} = require('mongoose');
+const mongoose = require('mongoose');
 
 const userSchema = new Schema(
     {
         username: {
-            Type: String,
+            type: String,
             unique: true,
             required: [true, 'Username is required'],
             trim: true
         },
         email: {
-            Type: String,
+            type: String,
             required: [true, 'Email is required'],
             unique: true,
             validation: {
@@ -21,13 +22,13 @@ const userSchema = new Schema(
         },
         thoughts: [
             {
-                Type: Types.ObjectId,
+                type: Types.ObjectId,
                 ref: 'Thought',
             }
         ],
         friends: [
             {
-                Type: Types.ObjectId,
+                type: Schema.Types.ObjectId,
                 ref: 'User',
             }
         ]
@@ -41,6 +42,43 @@ userSchema.virtual('friendCount').get(function (){
     return this.friends.length;
 })
 
-const User = model('user',userSchema)
+// userSchema.pre('deleteOne', async function(next){
+//     console.log(this.username);
+    
+//     await mongoose.model('Thought')
+    
+//         .deleteMany(
+//             {username: this.username},
+//             (err,response) => {
+//                 if(err){
+//                     console.log(err);
+//                 } else {
+//                     console.log('Successfully deleted associated Thoughts')
+//                 }
+//             });
+//             await mongoose.model('Thought').updateMany(
+//                 {},
+//                 {$pull: {
+//                     'reactions': {
+//                         'username': this.username
+//                     }
+//                 }},
+//                 {
+//                     multi: true
+//                 },
+//             (err,response) => {
+//                 if(err){
+//                     console.log(err);
+//                     next(err);
+//                 } else {
+//                     console.log('Successfully deleted associated Reactions')
+//                     next();
+//                 }
+//             })
+// });
+
+const User = model('User',userSchema)
+
+
 
 module.exports = User;

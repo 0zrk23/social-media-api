@@ -3,7 +3,7 @@ const db = require('./config/connection');
 const routes = require('./routes')
 const {set} = require('mongoose');
 
-set('toJSON',{virtuals: true, getters: true});
+
 
 // const cwd = process.cwd();
 
